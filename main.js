@@ -19,10 +19,15 @@ App.use("/url", urlRoute);
 
 App.get("/:shortId", async (req, res) => {
   const shortid = req.params.shortId;
-  const entry = await URL.findOneAndUpdate({shortid}, {
-    $push: { visitHistory: { timestamp: Date.now() } },
-  });
+  const entry = await URL.findOneAndUpdate(
+    { shortid },
+    {
+      $push: { visitHistory: { timestamp: Date.now() } },
+    }
+  );
   if (entry === null) return res.json({ msg: `entry is null ${entry}` });
+  if (entry.reDirectUrl === undefined)
+    return res.json({ msg: `entry is null ${entry}` });
   res.redirect(entry.reDirectUrl);
 });
 
