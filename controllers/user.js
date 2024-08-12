@@ -2,16 +2,25 @@ const URL = require("../models/user");
 const { generate } = require("randomstring");
 
 async function HandleGetAllUser(req, res) {
-  const Body = req.body;
-  if (Body?.url === undefined)
+  const body = req.body;
+  if (body.url === undefined)
     return res.status(404).json({ err: "url required" });
   const shortUrl = generate(8);
-  console.log(Body.url);
   await URL.create({
     shortURL: shortUrl,
-    reDirectUrl: Body.url,
+    reDirectUrl: body.url,
     visitHistory: [],
   });
   return res.json({ url: shortUrl });
 }
-module.exports = { HandleGetAllUser };
+
+async function handleGetAnalytics(req, res) {
+  const shortURL = req.params.shortId;
+  const result = await URL.findOne({ shortURL });
+  res.json({
+    totalClicks: result.visitHistory.length,
+    Analytics: result.visitHistory,
+  });
+}
+
+module.exports = { HandleGetAllUser, handleGetAnalytics };
